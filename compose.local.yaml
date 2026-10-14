@@ -1,0 +1,26 @@
+name: keycloak-local
+services:
+  keycloak:
+    image: vcsoc/keycloak:local
+    build:
+      context: ./quarkus/container
+      args:
+        KEYCLOAK_DIST: target/keycloak-999.0.0-SNAPSHOT.tar.gz
+        KEYCLOAK_VERSION: 999.0.0-SNAPSHOT
+        KEYCLOAK_SOURCE: https://github.com/vcsoc/keycloak
+    # Default fork branch is a development snapshot; original 26.4 data is backed up.
+    command: [start-dev, --spi-datastore--legacy--allow-migrate-existing-database-to-snapshot=true]
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8180:8080"
+    volumes:
+      - type: bind
+        source: /home/vcsoc/data/keycloak
+        target: /opt/keycloak/data
+        bind:
+          create_host_path: false
+networks:
+  default:
+    external: true
+    name: keycloak-local_default
